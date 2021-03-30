@@ -1,0 +1,16 @@
+base:
+  - wingpanel
+  - dunst
+
+software:
+  - group:
+    - category: "Browser"
+    - packages:
+      - firefox-developer-edition
+      - vivaldi
+  
+  - group:
+    - category: "Design"
+    - packages:
+      - inkscape
+      - gimp
