@@ -1,6 +1,7 @@
 import gi
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
+from utils import progressbar
 from gi.repository import GLib, Pamac as p
 
 
@@ -18,9 +19,9 @@ class Pamac:
         self.transaction.connect("emit-hook-progress", self.on_emit_hook_progress, self.packages)
         self.transaction.connect("emit-error", self.on_emit_error, self.packages)
         self.transaction.connect("emit-warning", self.on_emit_warning, self.packages)
+        
         self.loop = GLib.MainLoop()
  
-
     def get_app_icon(self, pkg):
         return self.db.get_pkg(pkg).get_icon()
 
@@ -34,7 +35,9 @@ class Pamac:
        print(action)
 
     def on_emit_action_progress(self, transaction, action, status, progress, data):
-        print(f"{action} {status}")
+        print(f"{action} {status} {progress}")
+        progressbar.set_fraction(progress)
+      
 
     def on_emit_hook_progress(self, transaction, action, details, status, progress, data):
         print(f"{action} {details} {status}")
@@ -65,6 +68,7 @@ class Pamac:
 
     def run_transaction(self):
        print(self.packages)
+       progressbar.pulse()
        for pkg in self.packages:
          self.transaction.add_pkg_to_install(pkg)
 

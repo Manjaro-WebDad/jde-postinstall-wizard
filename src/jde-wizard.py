@@ -5,9 +5,9 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from sources import get_remote_source, load_yaml
+from utils import progressbar
 from packageManager import Pamac 
 pamac = Pamac()
-
 
 class Wizard:
     def __init__(self):
@@ -20,7 +20,7 @@ class Wizard:
         self.wizard.connect('apply', self.on_apply)
         self.wizard.connect('prepare', self.on_prepare)
         self.intro()
-        self.pages()        
+        self.pages()    
         self.wizard.show()        
 
     def on_close_cancel(self, wizard):
@@ -88,7 +88,7 @@ class Wizard:
         grid.show_all()
         self.wizard.append_page(grid)
         self.wizard.set_page_complete(grid, True)
-        self.wizard.set_page_title(grid, 'Remote Software Workflow')
+        self.wizard.set_page_title(grid, 'Remote Workflow')
         self.wizard.set_page_type(grid, Gtk.AssistantPageType.PROGRESS)
         entry.connect("changed", self.on_input_changed)
 
@@ -126,16 +126,25 @@ class Wizard:
 
 
     def done_page(self):
-        introbox = Gtk.HBox(homogeneous=False, spacing=12)
-        introbox.set_border_width(12)
+        box = Gtk.HBox(homogeneous=False, spacing=12)
+        box.set_border_width(12)        
+        grid = Gtk.Grid()
         label = Gtk.Label(
-            label='This is a confirmation page, press apply if you ready')
-        introbox.pack_start(label, True, True, 0)
-        introbox.show_all()
-        self.wizard.append_page(introbox)
-        self.wizard.set_page_complete(introbox, True)
-        self.wizard.set_page_title(introbox, 'All Done')
-        self.wizard.set_page_type(introbox, Gtk.AssistantPageType.CONFIRM)
+            label='This is a confirmation page, press apply if you ready'
+            )
+        label.set_hexpand(True)
+        box.pack_start(grid, True, True, 0)
+        grid.attach(label, 0, 0, 1, 1)
+        grid.attach(progressbar, 0, 2, 1, 1)
+        #grid.set_column_homogeneous(True)
+        #grid.set_row_homogeneous(True)
+        grid.set_row_spacing(20)
+        grid.set_baseline_row(2)
+        box.show_all()
+        self.wizard.append_page(box)
+        self.wizard.set_page_complete(box, True)
+        self.wizard.set_page_title(box, 'All Done')
+        self.wizard.set_page_type(box, Gtk.AssistantPageType.CONFIRM)
 
    
 def main():
