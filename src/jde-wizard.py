@@ -2,11 +2,11 @@
 # Copyright (C) 2021 Vitor Lopes
 
 import gi
-gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+gi.require_version("Gtk", "3.0")
 from sources import get_remote_source, load_yaml
+from packageManager import Pamac  
 from utils import progressbar
-from packageManager import Pamac 
 pamac = Pamac()
 
 class Wizard:
@@ -67,7 +67,6 @@ class Wizard:
         grid = Gtk.Grid()
         grid.set_row_spacing(20)
         grid.set_column_spacing(10)
-        #grid.set_row_homogeneous(True)
         grid.set_column_homogeneous(True)
         self.wizard.add(grid)
         label1 = Gtk.Label()
@@ -124,7 +123,6 @@ class Wizard:
             self.wizard.set_page_title(box, title)
             self.wizard.set_page_type(box, Gtk.AssistantPageType.PROGRESS)
 
-
     def done_page(self):
         box = Gtk.HBox(homogeneous=False, spacing=12)
         box.set_border_width(12)        
@@ -136,8 +134,6 @@ class Wizard:
         box.pack_start(grid, True, True, 0)
         grid.attach(label, 0, 0, 1, 1)
         grid.attach(progressbar, 0, 2, 1, 1)
-        #grid.set_column_homogeneous(True)
-        #grid.set_row_homogeneous(True)
         grid.set_row_spacing(20)
         grid.set_baseline_row(2)
         box.show_all()

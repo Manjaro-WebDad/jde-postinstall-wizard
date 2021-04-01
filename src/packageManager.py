@@ -1,7 +1,7 @@
 import gi
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
-from utils import progressbar
+from utils import set_progress
 from utils import update_mirrors
 from gi.repository import GLib, Pamac as p
 
@@ -32,16 +32,19 @@ class Pamac:
     def test_pkg(self, pkg):
         return self.db.get_pkg(pkg).get_name()
 
+    def get_installed_pkgs(self):
+        return self.db.get_installed_pkgs()
+
     def on_emit_action(self, transaction, action, data):
        print(action)
 
     def on_emit_action_progress(self, transaction, action, status, progress, data):
         print(f"{action} {status} {progress}")
-        progressbar.set_fraction(progress)
-      
+        set_progress(progress)      
 
     def on_emit_hook_progress(self, transaction, action, details, status, progress, data):
         print(f"{action} {details} {status}")
+        set_progress(progress)
 
     def on_emit_warning(self, transaction, message, data):
         print(message)
@@ -66,17 +69,22 @@ class Pamac:
        finally:
          self.loop.quit()
          self.transaction.quit_daemon()
+    
+    def run_transaction(self):        
+        self.transaction.add_pkgs_to_upgrade(self.get_installed_pkgs())
+        for pkg in self.packages:
+            self.transaction.add_pkg_to_install(pkg)
 
-    def run_transaction(self):
-       update_mirrors()
-       print(self.packages)
-       progressbar.pulse()
-       for pkg in self.packages:
-         self.transaction.add_pkg_to_install(pkg)
+        self.transaction.run_async(self.on_transaction_finished_callback, None)
+        self.loop.run()
 
-       self.transaction.run_async(self.on_transaction_finished_callback, None)
-       self.loop.run()
+    def on_timeout(self, *args):
+        set_progress(0)
+        return True
 
     def install(self):
+        GLib.timeout_add(500, self.on_timeout, None)
+        update_mirrors()
+        print(f"packages:{self.packages}")
         self.run_transaction()
         
