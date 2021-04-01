@@ -62,7 +62,8 @@ class Wizard:
         ##TODO: this section needs to be added at the end in case packages already exist in the list
         packages = user_data.get("packages")
         for pkg in packages:
-            pamac.packages.append(pkg)
+            if pamac.test_pkg(pkg) == pkg:
+                pamac.packages.append(pkg)
 
     def app_on_select(self, btn, pkg):
         if btn.get_active():
