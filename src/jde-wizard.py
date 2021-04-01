@@ -2,6 +2,7 @@
 # Copyright (C) 2021 Vitor Lopes
 
 import gi
+import os
 from gi.repository import Gtk
 gi.require_version("Gtk", "3.0")
 from sources import get_remote_source, load_yaml
@@ -17,7 +18,6 @@ class Wizard:
         self.wizard.set_title("Wizard")
         self.wizard.connect('cancel', self.on_close_cancel)
         self.wizard.connect('close', self.on_close_cancel)
-        self.wizard.connect('apply', self.on_apply)
         self.wizard.connect('prepare', self.on_prepare)
         self.intro()
         self.pages()    
@@ -28,7 +28,16 @@ class Wizard:
         Gtk.main_quit()
 
     def on_apply(self, wizard):
-        pamac.install()
+        lock = "/var/lib/pacman/db.lck"
+        if os.path.isfile(lock):
+            ##TODO show warning modal
+            pass
+        else:
+            f = open(lock, "w")
+            f.close()
+            pamac.install()
+            os.remove(lock)
+            ##TODO show reboot modal
 
     def on_prepare(self, wizard, page):
         current_page = self.wizard.get_current_page()
@@ -137,6 +146,7 @@ class Wizard:
         grid.set_row_spacing(20)
         grid.set_baseline_row(2)
         box.show_all()
+        self.wizard.connect('apply', self.on_apply, label)
         self.wizard.append_page(box)
         self.wizard.set_page_complete(box, True)
         self.wizard.set_page_title(box, 'All Done')
