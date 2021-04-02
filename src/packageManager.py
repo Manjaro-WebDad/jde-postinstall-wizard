@@ -97,7 +97,7 @@ class Pamac:
         return True
 
     def install(self):
-        GLib.timeout_add(300, self.on_timeout, None)
+        GLib.timeout_add(150, self.on_timeout, None)
         update_mirrors()
         print(f"packages:{self.packages}")
         self.run_transaction()
