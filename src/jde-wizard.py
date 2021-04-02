@@ -27,27 +27,29 @@ class Wizard:
         wizard.destroy()
         Gtk.main_quit()
 
-    def on_apply(self, wizard):
-        lock = "/var/lib/pacman/db.lck"
-        if os.path.isfile(lock):
-            ##TODO show warning modal
+    def on_apply(self, wizard, label):
+        try:
+            lock = "/var/lib/pacman/db.lck"
+            if os.path.isfile(lock):
+                ##TODO show warning modal
+                pass
+            else:
+                f = open(lock, "w")
+                f.close()
+                os.remove(lock)
+                ##TODO show reboot modal
+        except PermissionError:
             pass
-        else:
-            f = open(lock, "w")
-            f.close()
+        finally:
             pamac.install()
-            os.remove(lock)
-            ##TODO show reboot modal
 
     def on_prepare(self, wizard, page):
         current_page = self.wizard.get_current_page()
         print(f"page:{current_page} {pamac.packages}")
         if current_page == 0:
-            packages = pamac.data.get("base")
-            if packages != None:
-                for pkg in packages:
-                    if pamac.test_pkg(pkg) == pkg:
-                        pamac.packages.append(pkg)
+            pamac.check_packages(
+                pamac.data.get("base")
+                )
         
         elif current_page == self.last_page:
             self.done_page()
@@ -60,10 +62,7 @@ class Wizard:
                 )
             )
         ##TODO: this section needs to be added at the end in case packages already exist in the list
-        packages = user_data.get("packages")
-        for pkg in packages:
-            if pamac.test_pkg(pkg) == pkg:
-                pamac.packages.append(pkg)
+        pamac.check_packages( user_data.get("packages") )
 
     def app_on_select(self, btn, pkg):
         if btn.get_active():

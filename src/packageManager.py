@@ -21,7 +21,7 @@ class Pamac:
         self.transaction.connect("emit-error", self.on_emit_error, self.packages)
         self.transaction.connect("emit-warning", self.on_emit_warning, self.packages)        
         self.loop = GLib.MainLoop()
-        print(dir(self.transaction))
+        ##print(dir(self.db))
  
     def get_app_icon(self, pkg):
         return self.db.get_pkg(pkg).get_icon()
@@ -29,11 +29,25 @@ class Pamac:
     def get_app_name(self, pkg):
         return self.db.get_pkg(pkg).get_app_name()
 
-    def test_pkg(self, pkg):
-        return self.db.get_pkg(pkg).get_name()
+    def pkg_exits(self, pkg):
+        if self.db.get_pkg(pkg).get_name() == pkg:
+          return True 
+        else:
+          return False
+
+    def check_packages(self, packages):    
+      if packages != None:
+        for pkg in packages:
+            if self.pkg_exits( pkg ):
+                if pkg not in self.get_installed_pkgs():
+                    self.packages.append(pkg)
 
     def get_installed_pkgs(self):
-        return self.db.get_installed_pkgs()
+      pkgs = []
+      for pkg in self.db.get_installed_pkgs():
+        pkgs.append( pkg.get_name() )
+        print("installed packages:", pkgs)
+        return pkgs
 
     def on_emit_action(self, transaction, action, data):
        print(action)
@@ -71,7 +85,7 @@ class Pamac:
          self.transaction.quit_daemon()
     
     def run_transaction(self):        
-        self.transaction.add_pkgs_to_upgrade(self.get_installed_pkgs())
+        self.transaction.add_pkgs_to_upgrade(self.db.get_installed_pkgs())
         for pkg in self.packages:
             self.transaction.add_pkg_to_install(pkg)
 
@@ -83,7 +97,7 @@ class Pamac:
         return True
 
     def install(self):
-        GLib.timeout_add(500, self.on_timeout, None)
+        GLib.timeout_add(300, self.on_timeout, None)
         update_mirrors()
         print(f"packages:{self.packages}")
         self.run_transaction()
