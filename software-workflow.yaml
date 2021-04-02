@@ -1,6 +1,9 @@
 base:
   - wingpanel
   - dunst
+  
+pre-selected:
+  - firefox-developer-edition
 
 software:
   - group:
