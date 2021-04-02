@@ -18,7 +18,7 @@ class Wizard:
         self.wizard.fullscreen()
         self.wizard.set_title("Wizard")
         self.wizard.connect('cancel', self.on_close_cancel)
-        #self.wizard.remove_action_widget()
+        self.wizard.commit()
         self.wizard.connect('close', self.on_close_cancel)
         self.wizard.connect('prepare', self.on_prepare)
         self.pre_selected = pamac.data.get("pre-selected")
@@ -69,7 +69,7 @@ class Wizard:
 
     def app_on_select(self, btn, pkg):
         if btn.get_active():
-            pamac.packages.append(pkg)
+            pamac.check_packages(pkg)
         else:
             pamac.packages.remove(pkg)
         print(pamac.packages)
@@ -80,8 +80,7 @@ class Wizard:
         grid.set_row_spacing(20)
         grid.set_column_spacing(10)
         grid.set_column_homogeneous(True)
-        grid.props.valign = Gtk.Align.CENTER
-        grid.props.halign = Gtk.Align.CENTER
+        grid.props.valign = grid.props.halign = Gtk.Align.CENTER
         self.wizard.add(grid)
         label1 = Gtk.Label()
         label1.set_markup(
@@ -164,7 +163,7 @@ class Wizard:
         grid.set_row_spacing(20)
         grid.set_baseline_row(2)
         grid.set_row_homogeneous(True)
-        grid.props.valign = Gtk.Align.CENTER
+        grid.props.valign = grid.props.halign = Gtk.Align.CENTER
         box.show_all()
         self.wizard.connect('apply', self.on_apply, label)
         self.wizard.append_page(box)

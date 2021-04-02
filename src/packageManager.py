@@ -4,7 +4,7 @@ from sources import load_yaml
 from utils import set_progress
 from utils import update_mirrors
 from gi.repository import GLib, Pamac as p
-
+update_mirrors()
 
 class Pamac:
     def __init__(self):
@@ -35,19 +35,26 @@ class Pamac:
         else:
           return False
 
-    def check_packages(self, packages):    
-      if packages != None:
-        for pkg in packages:
-            if self.pkg_exits( pkg ):
-                if pkg not in self.get_installed_pkgs():
-                    self.packages.append(pkg)
+    def check_packages(self, packages):
+      
+      def check_pkg(pkg):
+        if self.pkg_exits(pkg):
+            if pkg not in self.get_installed_pkgs():
+                self.packages.append(pkg)
+          
+      if isinstance(packages, (list, tuple)):
+        if packages != None:
+          for pkg in packages:
+            check_pkg(pkg)              
+      else:
+        check_pkg(packages)
+        
 
     def get_installed_pkgs(self):
       pkgs = []
       for pkg in self.db.get_installed_pkgs():
         pkgs.append( pkg.get_name() )
-        print("installed packages:", pkgs)
-        return pkgs
+      return pkgs
 
     def on_emit_action(self, transaction, action, data):
        print(action)
@@ -97,8 +104,8 @@ class Pamac:
         return True
 
     def install(self):
-        GLib.timeout_add(150, self.on_timeout, None)
-        update_mirrors()
-        print(f"packages:{self.packages}")
-        self.run_transaction()
+      if self.packages:
+         GLib.timeout_add(150, self.on_timeout, None)
+         print(f"packages:{self.packages}")
+         self.run_transaction()
         
