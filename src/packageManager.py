@@ -2,7 +2,7 @@ import gi
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
 from utils import set_progress
-from utils import update_mirrors
+from utils import update_mirrors, run_postinstall
 from gi.repository import GLib, Pamac as p
 update_mirrors()
 
@@ -37,19 +37,21 @@ class Pamac:
 
     def check_packages(self, packages):
       
-      def check_pkg(pkg):
-        if self.pkg_exits(pkg):
+        def check_pkg(pkg):
+          if self.pkg_exits(pkg):
+            print("package exist:", pkg)
             if pkg not in self.get_installed_pkgs():
                 self.packages.append(pkg)
-          
-      if isinstance(packages, (list, tuple)):
-        if packages != None:
-          for pkg in packages:
-            check_pkg(pkg)              
-      else:
-        check_pkg(packages)
+            else:
+              print("package installed:", pkg)
+                  
+        if packages != None:  
+          if isinstance(packages, (list, tuple)):       
+            for pkg in packages:
+              check_pkg(pkg)              
+          else:
+            check_pkg(packages)
         
-
     def get_installed_pkgs(self):
       pkgs = []
       for pkg in self.db.get_installed_pkgs():
@@ -81,10 +83,9 @@ class Pamac:
     def on_transaction_finished_callback(self, source_object, result, user_data):
        try:
          success = source_object.run_finish(result)
+         run_postinstall()
        except GLib.GError as e:
          print("Error: ", e.message)
-         ##TODO run postinstall script.
-         ## show all finish modal
        else:
          print("Success :", success)
        finally:
@@ -105,7 +106,7 @@ class Pamac:
 
     def install(self):
       if self.packages:
-         GLib.timeout_add(150, self.on_timeout, None)
+         GLib.timeout_add(50, self.on_timeout, None)
          print(f"packages:{self.packages}")
          self.run_transaction()
         

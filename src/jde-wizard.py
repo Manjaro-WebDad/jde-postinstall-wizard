@@ -46,7 +46,7 @@ class Wizard:
         except PermissionError:
             pass
         finally:
-            pamac.install()
+            pamac.install()            
 
     def on_prepare(self, wizard, page):
         current_page = self.wizard.get_current_page()
@@ -71,7 +71,10 @@ class Wizard:
         if btn.get_active():
             pamac.check_packages(pkg)
         else:
-            pamac.packages.remove(pkg)
+            try:
+                pamac.packages.remove(pkg)
+            except ValueError:
+                pass
         print(pamac.packages)
 
 
