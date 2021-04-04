@@ -1,10 +1,11 @@
 import gi
+import time
+import utils
+import dialog
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
-from utils import set_progress
-from utils import update_mirrors, run_postinstall
+gi.require_version("Gtk", "3.0")
 from gi.repository import GLib, Pamac as p
-update_mirrors()
 
 class Pamac:
     def __init__(self):
@@ -29,7 +30,7 @@ class Pamac:
     def get_app_name(self, pkg):
         return self.db.get_pkg(pkg).get_app_name()
 
-    def pkg_exits(self, pkg):
+    def pkg_exists(self, pkg):
         if self.db.get_pkg(pkg).get_name() == pkg:
           return True 
         else:
@@ -38,8 +39,8 @@ class Pamac:
     def check_packages(self, packages):
       
         def check_pkg(pkg):
-          if self.pkg_exits(pkg):
-            print("package exist:", pkg)
+          if self.pkg_exists(pkg):
+            print("package exists:", pkg)
             if pkg not in self.get_installed_pkgs():
                 self.packages.append(pkg)
             else:
@@ -63,11 +64,14 @@ class Pamac:
 
     def on_emit_action_progress(self, transaction, action, status, progress, data):
         print(f"{action} {status} {progress}")
-        set_progress(progress)      
+        if self.timeout:
+           GLib.source_remove(self.timeout)
+           self.timeout = False
+        utils.set_progress(progress)      
 
     def on_emit_hook_progress(self, transaction, action, details, status, progress, data):
         print(f"{action} {details} {status}")
-        set_progress(progress)
+        utils.set_progress(progress)
 
     def on_emit_warning(self, transaction, message, data):
         print(message)
@@ -83,11 +87,12 @@ class Pamac:
     def on_transaction_finished_callback(self, source_object, result, user_data):
        try:
          success = source_object.run_finish(result)
-         run_postinstall()
        except GLib.GError as e:
          print("Error: ", e.message)
        else:
          print("Success :", success)
+         utils.run_postinstall()
+         dialog.Modal().start()
        finally:
          self.loop.quit()
          self.transaction.quit_daemon()
@@ -101,12 +106,12 @@ class Pamac:
         self.loop.run()
 
     def on_timeout(self, *args):
-        set_progress(0)
+        utils.set_progress(0)
         return True
 
     def install(self):
       if self.packages:
-         GLib.timeout_add(50, self.on_timeout, None)
+         self.timeout = GLib.timeout_add(50, self.on_timeout, None)
+         utils.update_mirrors()
          print(f"packages:{self.packages}")
-         self.run_transaction()
-        
+         self.run_transaction()       

@@ -15,10 +15,9 @@ class Wizard:
         self.last_page = 0
         self.wizard = Gtk.Assistant()
         self.wizard.set_type_hint(Gdk.WindowTypeHint.SPLASHSCREEN)
-        self.wizard.fullscreen()
+        self.wizard.maximize()
         self.wizard.set_title("Wizard")
         self.wizard.connect('cancel', self.on_close_cancel)
-        self.wizard.commit()
         self.wizard.connect('close', self.on_close_cancel)
         self.wizard.connect('prepare', self.on_prepare)
         self.pre_selected = pamac.data.get("pre-selected")
@@ -33,22 +32,10 @@ class Wizard:
 
     def on_apply(self, wizard, label):
         label.set_text("Installing, grab a cup of coffee")
-        try:
-            lock = "/var/lib/pacman/db.lck"
-            if os.path.isfile(lock):
-                ##TODO show warning modal
-                pass
-            else:
-                f = open(lock, "w")
-                f.close()
-                os.remove(lock)
-                ##TODO show reboot modal
-        except PermissionError:
-            pass
-        finally:
-            pamac.install()            
+        pamac.install()            
 
     def on_prepare(self, wizard, page):
+        self.wizard.commit()
         current_page = self.wizard.get_current_page()
         print(f"page:{current_page} {pamac.packages}")
         if current_page == 0:
@@ -64,7 +51,6 @@ class Wizard:
                 source=input
                 )
             )
-        ##TODO: this section needs to be added at the end in case packages already exist in the list
         pamac.check_packages( user_data.get("packages") )
 
     def app_on_select(self, btn, pkg):
@@ -79,6 +65,7 @@ class Wizard:
 
 
     def intro(self):
+        grid2 = Gtk.Grid()
         grid = Gtk.Grid()
         grid.set_row_spacing(20)
         grid.set_column_spacing(10)
@@ -91,8 +78,12 @@ class Wizard:
         )
         label2 = Gtk.Label(
             label="Make sure you are connected to the internet before proceding."
-        )
-        
+        )        
+        label1.get_style_context().add_class("large-fonts")
+        label2.get_style_context().add_class("white-fonts")        
+        label3 = Gtk.Label(label="powered by Pamac.")
+        label3.get_style_context().add_class("pamac")
+        grid2.add(label3)        
         label2.set_line_wrap(True)
         label2.get_style_context().add_class("margin-bottom")
         label1.set_max_width_chars(32)
@@ -100,6 +91,7 @@ class Wizard:
         entry.set_text("optional: insert a remote software workflow in yaml format")
         grid.attach(label1, 0, 0, 1, 1)
         grid.attach(label2, 0, 2, 1, 1)
+        grid.attach(grid2, 0, 4, 1, 1)
         grid.attach(entry, 0, 3, 1, 1)
         grid.show_all()
         self.wizard.append_page(grid)
@@ -115,10 +107,10 @@ class Wizard:
             self.last_page += 1
             title = p["group"][0]["category"]
             pkg_list = p["group"][1]["packages"]
-            box = Gtk.VBox(spacing=12)
+            box = Gtk.VBox(spacing=8)
             box.props.valign = Gtk.Align.CENTER
             box.props.halign = Gtk.Align.CENTER
-            box.set_border_width(12)
+            box.set_border_width(8)
             grid = Gtk.Grid()
             grid.get_style_context().add_class("apps")
             box.add(grid)
@@ -157,15 +149,14 @@ class Wizard:
         box.set_border_width(12)        
         grid = Gtk.Grid()
         label = Gtk.Label(
-            label='All setup, press apply to continue'
+            label='All setup, press apply to start'
             )
+        label.get_style_context().add_class("large-fonts")
         label.set_hexpand(True)
         box.pack_start(grid, True, True, 0)
         grid.attach(label, 0, 0, 1, 1)
         grid.attach(progressbar, 0, 2, 1, 1)
-        grid.set_row_spacing(20)
-        grid.set_baseline_row(2)
-        grid.set_row_homogeneous(True)
+        grid.set_row_spacing(15)
         grid.props.valign = grid.props.halign = Gtk.Align.CENTER
         box.show_all()
         self.wizard.connect('apply', self.on_apply, label)
@@ -176,11 +167,22 @@ class Wizard:
         
     provider = Gtk.CssProvider()
     css = b"""
-        box grid label {
-            color: white;
+        .large-fonts {
             font-size: 20px;
             font-weight:bold;
             }
+            
+        .pamac {
+            font-weight:bold;
+            }
+            
+        box grid label, .white-fonts {
+            color: #fafafa;
+            }
+            
+        .white-fonts {
+            font-weight:bold;
+        }
             
         progress, trough {
             min-height: 1px;
@@ -192,7 +194,6 @@ class Wizard:
             }
             
         .sidebar label {
-            color:red;
             font-size:0;
             opacity:0;
             }
@@ -203,12 +204,11 @@ class Wizard:
             
         box .apps label:not(.category) {
             font-size:16px;
-            color: white;
             font-weight:bold;
             padding:10px;
             }
             
-        box {
+        box, dialog {
             background:#4a148c;
             }
             
@@ -239,11 +239,26 @@ class Wizard:
             min-height: 20px;
             min-width: 20px;
         }
+        
+        .modal buttonbox {
+            padding: 40px;
+        }
+            
+        * {
+            -GtkDialog-content-area-border:0;
+            }
+               
+        .modal button:nth-child(2) {
+            background:#fb8c00;
+            color:white;
+            }
         """
 
     provider.load_from_data(css)
-    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),
-                                             provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    Gtk.StyleContext.add_provider_for_screen(
+        Gdk.Screen.get_default(), provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
    
 def main():

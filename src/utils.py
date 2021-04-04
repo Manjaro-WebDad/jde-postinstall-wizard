@@ -7,8 +7,8 @@ from sources import get_remote_source, remote_workflow
 progressbar = Gtk.ProgressBar()
 
 def shell(cmd):
-  return Popen(cmd)  
-
+  return Popen(cmd)
+                            
 def set_progress(progress):
   if progress:
     progressbar.set_fraction(progress)
@@ -16,7 +16,7 @@ def set_progress(progress):
     progressbar.pulse()        
 
 def update_mirrors():    
-    shell(["pkexec", "pacman-mirrors", "--fasttrack"])   
+    shell(["pkexec", "pacman-mirrors", "--fasttrack"])  
     
 def run_postinstall():
   postinstall = "/usr/share/jde-wizard/postinstall"
@@ -25,4 +25,5 @@ def run_postinstall():
      p = shell(postinstall)
      p.wait()
   else:
-     print("post install script not found")    
+     print("post install script not found")  
+     
