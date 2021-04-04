@@ -168,19 +168,18 @@ class Wizard:
     provider = Gtk.CssProvider()
     css = b"""
         .large-fonts {
+            color: #fafafa;
             font-size: 20px;
             font-weight:bold;
             }
             
         .pamac {
+            color: #fafafa;
             font-weight:bold;
             }
             
-        box grid label, .white-fonts {
-            color: #fafafa;
-            }
-            
         .white-fonts {
+            color: #fafafa;
             font-weight:bold;
         }
             
@@ -202,7 +201,8 @@ class Wizard:
             border:0;
             }
             
-        box .apps label:not(.category) {
+        box .apps label {
+            color: #fafafa;
             font-size:16px;
             font-weight:bold;
             padding:10px;
