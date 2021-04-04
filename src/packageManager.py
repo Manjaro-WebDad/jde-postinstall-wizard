@@ -28,7 +28,13 @@ class Pamac:
         return self.db.get_pkg(pkg).get_icon()
 
     def get_app_name(self, pkg):
-        return self.db.get_pkg(pkg).get_app_name()
+        name = self.db.get_pkg(pkg).get_app_name()
+        if not name:
+          name = self.db.get_pkg(pkg).get_name()
+        if not name:
+          name = f"package not existent: {pkg}"
+          print("package not existent:", pkg)
+        return name
 
     def pkg_exists(self, pkg):
         if self.db.get_pkg(pkg).get_name() == pkg:

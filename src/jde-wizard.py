@@ -122,22 +122,22 @@ class Wizard:
 
             for pkg in pkg_list:                
                 next_row += 1
-                try:
+                checkbutton = Gtk.CheckButton(label=pamac.get_app_name(pkg))
+                checkbutton.connect("toggled", self.app_on_select, pkg)
+                grid.attach(checkbutton, 0, next_row, 1, 1)
+                if pkg in self.pre_selected:
+                    checkbutton.set_active(True)
+                image = pamac.get_app_icon(pkg)
+                if image:                        
                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        filename=pamac.get_app_icon(pkg),
+                        filename=image,
                         width=32,
                         height=32,
                         preserve_aspect_ratio=True
                         )
                     icon = Gtk.Image.new_from_pixbuf(pixbuf)
-                    checkbutton = Gtk.CheckButton(label=pamac.get_app_name(pkg))
-                    checkbutton.connect("toggled", self.app_on_select, pkg)
-                    grid.attach(checkbutton, 0, next_row, 1, 1)
-                    grid.attach_next_to(icon, checkbutton, Gtk.PositionType.RIGHT, 2, 1) 
-                    if pkg in self.pre_selected:
-                        checkbutton.set_active(True)
-                except AttributeError:
-                    print("package does not exits")
+                    grid.attach_next_to(icon, checkbutton, Gtk.PositionType.RIGHT, 2, 1)                         
+               
 
             box.show_all()
             self.wizard.append_page(box)

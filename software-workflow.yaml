@@ -94,10 +94,12 @@ software:
     - category: "Web Development"
     - packages:
       - atom
+      - docker
       - python-pip
       - ruby
       - rubygems
       - nodejs
+      - typescript
       - npm
       - php
   
