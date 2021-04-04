@@ -40,7 +40,8 @@ class Wizard:
         print(f"page:{current_page} {pamac.packages}")
         if current_page == 0:
             pamac.check_packages( pamac.data.get("base") )
-        
+        elif current_page == 1:
+            pamac.check_packages( pamac.data.get("applications") )        
         elif current_page == self.last_page:
             self.done_page()
 

@@ -1,6 +1,76 @@
 base:
-  - wingpanel
-  - dunst
+  - mousetweaks
+  - nss-mdns
+  - numlockx
+  - powertop
+  - inxi
+  #- dunst-notify-speech
+  - dmidecode
+  #- gtkhash-nautilus
+  - fprintd #need for finger id reader
+  - usb_modeswitch
+  - openssh
+  ##
+  - p7zip
+  - unrar
+  - unace
+  - lrzip
+  - manjaro-documentation-en
+  - kernel-alive
+  ##
+  - avahi
+  - networkmanager-openconnect
+  - networkmanager-openvpn
+  - networkmanager-pptp
+  - networkmanager-vpnc
+  ##
+  - ffmpeg
+  - grilo-plugins
+  - gst-libav
+  - gst-plugins-bad
+  - gst-plugins-base
+  - gst-plugins-good
+  - gst-plugins-ugly
+  - libdvdcss
+  ##
+  - android-tools
+  - android-udev
+  - gvfs
+  - gvfs-google
+  - gvfs-afc
+  - gvfs-gphoto2
+  - gvfs-mtp
+  - gvfs-nfs
+  - gvfs-smb
+  - mtpfs
+  - udiskie
+  - udisks2
+  ##
+  - snapd
+  - snapd-glib
+  - pamac-snap-plugin
+  #- pamac-flatpak-plugin
+  - apparmor
+  
+applications:
+  - simple-scan 
+  - nautilus-admin
+  - vlc
+  - gufw
+  - deja-dup
+  - syncthing-gtk
+  - hardinfo
+  - gthumb
+  - evince
+  - geary
+  - code
+  - file-roller
+  #- webapps-manager-manjaro
+  #- touchegg
+  - feedreader
+  - telegram-desktop
+  - bitwarden
+  - deepin-screenshot
   
 pre-selected:
   - firefox-developer-edition
@@ -17,3 +87,23 @@ software:
     - packages:
       - inkscape
       - gimp
+      - mypaint
+      - fontforge
+  
+  - group:
+    - category: "Web Development"
+    - packages:
+      - atom
+      - python-pip
+      - ruby
+      - rubygems
+      - nodejs
+      - npm
+      - php
+  
+  - group:
+    - category: "Virtual Machines"
+    - packages:
+      - gnome-boxes
+      - virtualbox
+      - virt-manager
