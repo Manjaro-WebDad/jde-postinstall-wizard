@@ -202,7 +202,7 @@ class Wizard:
             border:0;
             }
             
-        box .apps label {
+        box .apps label:not(.category) {
             color: #fafafa;
             font-size:16px;
             font-weight:bold;
@@ -224,6 +224,8 @@ class Wizard:
         label.category {
             border-bottom: 40px solid transparent;
             font-size: 32px;
+            color: #fafafa;
+            font-weight:bold;
             }
             
         button:first-child {

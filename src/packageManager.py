@@ -37,10 +37,13 @@ class Pamac:
         return name
 
     def pkg_exists(self, pkg):
+      try: 
         if self.db.get_pkg(pkg).get_name() == pkg:
           return True 
         else:
           return False
+      except AttributeError:
+        return False
 
     def check_packages(self, packages):
       
