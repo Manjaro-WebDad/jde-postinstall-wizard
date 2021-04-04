@@ -8,22 +8,21 @@ base:
   - dmidecode
   #- gtkhash-nautilus
   - fprintd #need for finger id reader
-  - usb_modeswitch
   - openssh
-  ##
+  - manjaro-documentation-en
+  - kernel-alive
+  ## File Compression
   - p7zip
   - unrar
   - unace
   - lrzip
-  - manjaro-documentation-en
-  - kernel-alive
-  ##
+  ## Network
   - avahi
   - networkmanager-openconnect
   - networkmanager-openvpn
   - networkmanager-pptp
   - networkmanager-vpnc
-  ##
+  ## Codecs
   - ffmpeg
   - grilo-plugins
   - gst-libav
@@ -32,7 +31,10 @@ base:
   - gst-plugins-good
   - gst-plugins-ugly
   - libdvdcss
-  ##
+  ## Connection Tools
+  - pantheon-print
+  - usb_modeswitch
+  - scrcpy # android screen mirror
   - android-tools
   - android-udev
   - gvfs
@@ -45,7 +47,17 @@ base:
   - mtpfs
   - udiskie
   - udisks2
-  ##
+  ## DE 
+  - wingpanel-indicator-datetime
+  - wingpanel-indicator-bluetooth
+  - switchboard-plug-bluetooth
+  - wingpanel-indicator-nightlight
+  - switchboard-plug-datetime
+  - switchboard-plug-desktop
+  - switchboard-plug-keyboard
+  - switchboard-plug-mouse-touchpad
+  - switchboard-plug-printers
+  ## Package Formats
   - snapd
   - snapd-glib
   - pamac-snap-plugin
@@ -53,6 +65,7 @@ base:
   - apparmor
   
 applications:
+  - manjaro-hello
   - simple-scan 
   - nautilus-admin
   - vlc
@@ -68,7 +81,6 @@ applications:
   #- webapps-manager-manjaro
   #- touchegg
   - feedreader
-  - telegram-desktop
   - bitwarden
   - deepin-screenshot
   
@@ -81,7 +93,26 @@ software:
     - packages:
       - firefox-developer-edition
       - vivaldi
+
+  - group:
+    - category: "Office"
+    - packages:
+      - libreoffice-fresh
+      - freeoffice
+      - microsoft-office-web-jak
   
+  - group:
+    - category: "Communication"
+    - packages:
+      - telegram-desktop
+      - skype-web-jak
+      - whatsapp-web-jak
+      - slack-web-jak
+      - discord
+      - mattermost
+      - teamspeak3
+      - kdeconnect
+
   - group:
     - category: "Design"
     - packages:
@@ -89,6 +120,19 @@ software:
       - gimp
       - mypaint
       - fontforge
+  
+  - group:
+    - category: "3Dprint"
+    - packages:
+      - cura
+      - openscad
+
+  - group:
+    - category: "Streaming"
+    - packages:
+      - obs-studio
+      - pitivi
+      - audacity
   
   - group:
     - category: "Web Development"
