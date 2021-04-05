@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # Copyright (C) 2021 Vitor Lopes
 
+import os   
 import gi
-import os
 from gi.repository import Gtk, Gdk, GdkPixbuf
 gi.require_version("Gtk", "3.0")
 from sources import get_remote_source, load_yaml
@@ -270,4 +270,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    first_run = "/etc/xdg/autostart/io.jde.postinstall-wizard.desktop"
+    if os.path.exists(first_run):
+        try:
+            os.remove(first_run)
+        except PermissionError:
+            pass
+        
+    if not os.path.exists("/etc/jde/live-iso"):
+        main()
