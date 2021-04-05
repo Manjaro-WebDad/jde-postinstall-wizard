@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-  <id>io.jde.postinstall-wizard</id>
-  <launchable type="desktop">io.jde.postinstall-wizard.desktop</launchable>
-  <project_license>GPL</project_license>
+  <id>io.jde.postinstall.wizard</id>
+  <launchable type="desktop-id">io.jde.postinstall-wizard.desktop</launchable>
+  <project_license>GPL-3.0-or-later</project_license>
   <metadata_license>CC0-1.0</metadata_license>
   <name>PostInstall Wizard</name>
+  <icon type="remote">https://raw.githubusercontent.com/Manjaro-WebDad/jde-postinstall-wizard/master/io.jde.postinstall-wizard.svg</icon>
   <summary>Postinstall software wizard</summary>
   <description>
     <p>Postinstall wizard, install extra software, clone your software workflow, restore or upgrade your installation</p>
@@ -15,12 +16,12 @@
   <url type="bugtracker">https://github.com/Manjaro-WebDad/jde-wizard</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source">todo</image>
+      <image type="source">https://raw.githubusercontent.com/Manjaro-WebDad/jde-postinstall-wizard/master/io.jde.postinstall-wizard.svg</image>
     </screenshot>
   </screenshots>
   <update_contact>https://github.com/Manjaro-WebDad/jde-wizard</update_contact>
   <releases>
-    <release version="v1.0" date="">
+    <release version="v1.0" date="2021-04-05">
      <description>
         <p>Postinstall wizard, install extra software, clone your software workflow, restore or upgrade your installation</p>
       </description>
