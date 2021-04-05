@@ -3,8 +3,8 @@
 
 import os   
 import gi
-from gi.repository import Gtk, Gdk, GdkPixbuf
 gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, Gdk, GdkPixbuf
 from sources import get_remote_source, load_yaml
 from packageManager import Pamac  
 from utils import progressbar

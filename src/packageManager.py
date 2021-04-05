@@ -1,10 +1,10 @@
 import gi
 import time
 import utils
+gi.require_version("Gtk", "3.0")
 import dialog
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
-gi.require_version("Gtk", "3.0")
 from gi.repository import GLib, Pamac as p
 
 class Pamac:
@@ -49,11 +49,10 @@ class Pamac:
       
         def check_pkg(pkg):
           if self.pkg_exists(pkg):
-            print("package exists:", pkg)
             if pkg not in self.get_installed_pkgs():
                 self.packages.append(pkg)
-            else:
-              print("package installed:", pkg)
+          else:
+            print("package not existent:", pkg)
                   
         if packages != None:  
           if isinstance(packages, (list, tuple)):       
@@ -123,4 +122,5 @@ class Pamac:
          self.timeout = GLib.timeout_add(50, self.on_timeout, None)
          utils.update_mirrors()
          print(f"packages:{self.packages}")
+         print(dir(self.transaction))
          self.run_transaction()       
