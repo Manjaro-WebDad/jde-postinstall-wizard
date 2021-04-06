@@ -22,8 +22,8 @@ class Pamac:
         self.transaction.connect("emit-error", self.on_emit_error, self.packages)
         self.transaction.connect("emit-warning", self.on_emit_warning, self.packages)        
         self.loop = GLib.MainLoop()
-        for i in dir(self.transaction):
-          print(i)
+        #for i in dir(self.transaction):
+        #  print(i)
 
  
     def get_app_icon(self, pkg):
@@ -103,6 +103,7 @@ class Pamac:
          print("Success :", success)
          utils.run_postinstall()
          dialog.Modal().start()
+         utils.remove_autostart()
        finally:
          self.loop.quit()
          self.transaction.quit_daemon()

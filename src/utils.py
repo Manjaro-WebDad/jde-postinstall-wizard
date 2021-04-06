@@ -8,6 +8,12 @@ progressbar = Gtk.ProgressBar()
 
 def shell(cmd):
   return Popen(cmd)
+
+def remove_autostart():
+  first_run = "/etc/xdg/autostart/io.jde.postinstall-wizard.desktop"
+  if os.path.exists(first_run):
+      from utils import shell
+      shell(["pkexec", "rm", "-f", first_run])
                             
 def set_progress(progress):
   if progress:
@@ -19,7 +25,7 @@ def update_mirrors():
     shell(["pkexec", "pacman-mirrors", "--fasttrack"])  
     
 def run_postinstall():
-  postinstall = "/usr/share/jde-wizard/postinstall"
+  postinstall = "/usr/share/jde-postinstall-wizard/scripts/postinstall"
   if os.path.exists(postinstall):
      print("Running post installation")
      p = shell(postinstall)

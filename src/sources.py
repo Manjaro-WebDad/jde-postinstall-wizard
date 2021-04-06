@@ -7,8 +7,7 @@ def get_edition():
   return os.environ.get('DESKTOP_SESSION').lower()
 
 def remote_workflow():
-  if get_edition() == "jde":
-    return "https://raw.githubusercontent.com/Manjaro-WebDad/jde-wizard/master/software-workflow.yaml"
+  return "https://raw.githubusercontent.com/Manjaro-WebDad/jde-wizard/master/software-workflow.yaml"
 
 def get_remote_source(source=remote_workflow()):
     try:
