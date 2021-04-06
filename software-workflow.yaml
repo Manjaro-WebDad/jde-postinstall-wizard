@@ -34,7 +34,6 @@ base:
   ## Connection Tools
   - pantheon-print
   - usb_modeswitch
-  - scrcpy # android screen mirror
   - android-tools
   - android-udev
   - gvfs
@@ -83,7 +82,10 @@ applications:
   - feedreader
   - bitwarden
   - deepin-screenshot
-  
+
+snaps:
+  - scrcpy # android screen mirror
+
 pre-selected:
   - firefox-developer-edition
 
@@ -146,6 +148,9 @@ software:
       - typescript
       - npm
       - php
+    
+    - snaps:
+      - code-insiders
   
   - group:
     - category: "Virtual Machines"

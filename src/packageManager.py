@@ -22,7 +22,9 @@ class Pamac:
         self.transaction.connect("emit-error", self.on_emit_error, self.packages)
         self.transaction.connect("emit-warning", self.on_emit_warning, self.packages)        
         self.loop = GLib.MainLoop()
-        ##print(dir(self.db))
+        for i in dir(self.transaction):
+          print(i)
+
  
     def get_app_icon(self, pkg):
         return self.db.get_pkg(pkg).get_icon()
@@ -122,5 +124,4 @@ class Pamac:
          self.timeout = GLib.timeout_add(50, self.on_timeout, None)
          utils.update_mirrors()
          print(f"packages:{self.packages}")
-         print(dir(self.transaction))
          self.run_transaction()       
