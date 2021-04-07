@@ -77,7 +77,7 @@ applications:
   - geary
   - code
   - file-roller
-  #- webapps-manager-manjaro
+  - webapps-manager-manjaro
   #- touchegg
   - feedreader
   - bitwarden
@@ -122,6 +122,22 @@ software:
       - gimp
       - mypaint
       - fontforge
+  
+  - group:
+    - category: "Gamming"
+    - packages:
+      - gnome-games
+      - lutris
+      - playonlinux
+      - steam-manjaro
+      - dolphin-emu
+      - fceux
+      - fs-uae-launcher
+      - pcsx2
+      - ppsspp
+      - snes9x-gtk
+      - desmume
+      - dgen-sdl
   
   - group:
     - category: "3Dprint"
