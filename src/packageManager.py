@@ -1,10 +1,12 @@
 import gi
 import time
 import utils
-gi.require_version("Gtk", "3.0")
 import dialog
+from importlib import reload
+gi.require_version("Gtk", "3.0")
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
+from utils import set_branch_mirrors
 from gi.repository import GLib, Pamac as p
 
 class Pamac:
@@ -100,15 +102,17 @@ class Pamac:
        except GLib.GError as e:
          print("Error: ", e.message)
        else:
-         print("Success :", success)
-         utils.run_postinstall()
-         dialog.Modal().start()
-         utils.remove_autostart()
+         if success:
+            utils.run_postinstall()
+            dialog.Modal().start()
+            utils.remove_autostart()
+         else:
+            print("Ops something went wrong.")
        finally:
          self.loop.quit()
          self.transaction.quit_daemon()
     
-    def run_transaction(self):        
+    def run_transaction(self): 
         self.transaction.add_pkgs_to_upgrade(self.db.get_installed_pkgs())
         for pkg in self.packages:
             self.transaction.add_pkg_to_install(pkg)
@@ -120,9 +124,10 @@ class Pamac:
         utils.set_progress(0)
         return True
 
-    def install(self):
+    def install(self, branch):
       if self.packages:
          self.timeout = GLib.timeout_add(50, self.on_timeout, None)
-         utils.update_mirrors()
-         print(f"packages:{self.packages}")
+         print(f"selected packages:{self.packages}")
+         print(f"selected branch: {branch}")
+         set_branch_mirrors(branch)
          self.run_transaction()       

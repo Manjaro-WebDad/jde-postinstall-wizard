@@ -7,12 +7,13 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from sources import get_remote_source, load_yaml
 from packageManager import Pamac  
-from utils import progressbar
+from utils import progressbar, get_branch
 pamac = Pamac()
 
 class Wizard:
     def __init__(self):
         self.last_page = 0
+        self.branch = get_branch()
         self.wizard = Gtk.Assistant()
         self.wizard.set_type_hint(Gdk.WindowTypeHint.SPLASHSCREEN)
         self.wizard.maximize()
@@ -32,12 +33,12 @@ class Wizard:
 
     def on_apply(self, wizard, label):
         label.set_text("Installing, grab a cup of coffee")
-        pamac.install()            
+        pamac.install(self.branch)            
 
     def on_prepare(self, wizard, page):
         self.wizard.commit()
         current_page = self.wizard.get_current_page()
-        print(f"page:{current_page} {pamac.packages}")
+        print(f"selected packages on page:{current_page} {pamac.packages}")
         if current_page == 0:
             pamac.check_packages( pamac.data.get("base") )
         elif current_page == 1:
@@ -46,10 +47,10 @@ class Wizard:
             self.done_page()
 
     def on_input_changed(self, *args):
-        input = args[0].get_text()
+        _input = args[0].get_text()
         user_data = load_yaml(
             source=get_remote_source(
-                source=input
+                source=_input
                 )
             )
         pamac.check_packages( user_data.get("packages") )
@@ -90,11 +91,32 @@ class Wizard:
         label1.set_max_width_chars(32)
         entry = Gtk.Entry()
         entry.set_text("optional: insert a remote software workflow in yaml format")
+        
+        branches = (
+            "Branch:  stable for users",
+            "Branch:  testing for testers",
+            "Branch:  unstable for developers"
+                    )
+        branch_name = Gtk.ComboBoxText()
+        branch_name.connect("changed", self.on_branch_changed)
+        for branch in branches:
+            branch_name.append_text(branch)
+        
+        if "stable" == self.branch:
+            active_branch = 0            
+        elif "testing" == self.branch:
+            active_branch = 1            
+        elif "unstable" == self.branch:
+            active_branch = 2
+        branch_name.set_active(active_branch)
+        
         grid.attach(label1, 0, 0, 1, 1)
         grid.attach(label2, 0, 2, 1, 1)
-        grid.attach(grid2, 0, 4, 1, 1)
+        grid.attach(grid2, 0, 5, 1, 1)
         grid.attach(entry, 0, 3, 1, 1)
+        grid.attach(branch_name, 0, 4, 1, 1)
         grid.show_all()
+        
         self.wizard.append_page(grid)
         self.wizard.set_page_complete(grid, True)
         self.wizard.set_page_title(grid, 'Remote Workflow')
@@ -145,6 +167,18 @@ class Wizard:
             self.wizard.set_page_title(box, title)
             self.wizard.set_page_type(box, Gtk.AssistantPageType.PROGRESS)
 
+    def on_branch_changed(self, selected_branch):
+        tree_iter = selected_branch.get_active_iter()
+        if tree_iter is not None:
+            model = selected_branch.get_model()
+            name = model[tree_iter][:2][0].lower()
+            if "testing" in name:
+                self.branch = "testing"
+            elif "unstable" in name:
+                self.branch = "unstable"
+            elif "stable" in name:
+                self.branch = "stable"
+        
     def done_page(self):
         box = Gtk.HBox(spacing=12)
         box.set_border_width(12)        
@@ -228,12 +262,12 @@ class Wizard:
             font-weight:bold;
             }
             
-        button:first-child {
+        button:first-child:not(.combo) {
             color:white;
             background:#f44336;
             }
             
-        button:last-child {
+        button:last-child:not(.combo) {
             color:white;
             background:#009688;
             }
@@ -254,6 +288,17 @@ class Wizard:
         .modal button:nth-child(2) {
             background:#fb8c00;
             color:white;
+            }
+        
+        .combo {
+            padding:10px;
+            color:#fafafa;
+            font-weight:bold;
+            border:1px dashed shade(white, 0.5);
+            }
+                       
+        .combo, .combo:focus, .combo:active, .combo:selected {
+            background-color:transparent;
             }
         """
 
