@@ -4,7 +4,7 @@
 import os   
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from sources import get_remote_source, load_yaml
 from packageManager import Pamac  
 from utils import progressbar, get_branch
@@ -21,12 +21,23 @@ class Wizard:
         self.wizard.connect('cancel', self.on_close_cancel)
         self.wizard.connect('close', self.on_close_cancel)
         self.wizard.connect('prepare', self.on_prepare)
-        self.pre_selected = pamac.data.get("pre-selected")
-        self.intro()
-        self.pages()    
+        self.internet_timeout = GLib.timeout_add(300, self.check_internet, None)
+        self.internet_label = Gtk.Label(
+            label="Checking for internet connection."
+        )
+        self.intro()    
         self.wizard.show()  
         
-
+    def check_internet(self, *args):
+        try:          
+            load_yaml().get("base")
+            GLib.source_remove(self.internet_timeout)
+            self.pages()
+            self.internet_label.set_label("Internet Connected.")
+        except Exception:
+            self.internet_label.set_label("No internet, make sure you are connected.")
+            return True
+       
     def on_close_cancel(self, wizard):
         wizard.destroy()
         Gtk.main_quit()
@@ -40,18 +51,17 @@ class Wizard:
         current_page = self.wizard.get_current_page()
         print(f"selected packages on page:{current_page} {pamac.packages}")
         if current_page == 0:
-            pamac.check_packages( pamac.data.get("base") )
+            pass            
         elif current_page == 1:
-            pamac.check_packages( pamac.data.get("applications") )        
+            pamac.check_packages(load_yaml().get("base"))
+            pamac.check_packages(load_yaml().get("applications"))
         elif current_page == self.last_page:
             self.done_page()
 
     def on_input_changed(self, *args):
-        _input = args[0].get_text()
+        user_input = args[0].get_text()
         user_data = load_yaml(
-            source=get_remote_source(
-                source=_input
-                )
+            source=get_remote_source(user_input)
             )
         pamac.check_packages( user_data.get("packages") )
 
@@ -77,17 +87,13 @@ class Wizard:
         label1 = Gtk.Label()
         label1.set_markup(
             "Hi, lets personalize and finish installation."
-        )
-        label2 = Gtk.Label(
-            label="Make sure you are connected to the internet before proceding."
-        )        
+        )       
         label1.get_style_context().add_class("large-fonts")
-        label2.get_style_context().add_class("white-fonts")        
+        self.internet_label.get_style_context().add_class("white-fonts")
         label3 = Gtk.Label(label="powered by Pamac.")
         label3.get_style_context().add_class("pamac")
         grid2.add(label3)        
-        label2.set_line_wrap(True)
-        label2.get_style_context().add_class("margin-bottom")
+        self.internet_label.set_line_wrap(True)
         label1.set_max_width_chars(32)
         entry = Gtk.Entry()
         entry.set_text("optional: insert a remote software workflow in yaml format")
@@ -111,10 +117,10 @@ class Wizard:
         branch_name.set_active(active_branch)
         
         grid.attach(label1, 0, 0, 1, 1)
-        grid.attach(label2, 0, 2, 1, 1)
-        grid.attach(grid2, 0, 5, 1, 1)
-        grid.attach(entry, 0, 3, 1, 1)
-        grid.attach(branch_name, 0, 4, 1, 1)
+        grid.attach(self.internet_label, 0, 5, 1, 1)
+        grid.attach(grid2, 0, 4, 1, 1)
+        grid.attach(entry, 0, 2, 1, 1)
+        grid.attach(branch_name, 0, 3, 1, 1)
         grid.show_all()
         
         self.wizard.append_page(grid)
@@ -123,10 +129,8 @@ class Wizard:
         self.wizard.set_page_type(grid, Gtk.AssistantPageType.PROGRESS)
         entry.connect("changed", self.on_input_changed)
 
-    def pages(self):      
-        software = pamac.data.get("software")
-
-        for p in software:
+    def pages(self):     
+        for p in load_yaml().get("software"):
             self.last_page += 1
             title = p["group"][0]["category"]
             pkg_list = p["group"][1]["packages"]
@@ -147,7 +151,9 @@ class Wizard:
                 checkbutton = Gtk.CheckButton(label=pamac.get_app_name(pkg))
                 checkbutton.connect("toggled", self.app_on_select, pkg)
                 grid.attach(checkbutton, 0, next_row, 1, 1)
-                if pkg in self.pre_selected:
+                pre_selected = load_yaml().get("pre-selected")
+
+                if pkg in pre_selected:
                     checkbutton.set_active(True)
                 image = pamac.get_app_icon(pkg)
                 if image:                        
@@ -211,6 +217,7 @@ class Wizard:
         .pamac {
             color: #fafafa;
             font-weight:bold;
+            border-bottom: 40px solid transparent;
             }
             
         .white-fonts {
@@ -251,9 +258,6 @@ class Wizard:
             padding:8px;
             }
             
-        .margin-bottom {
-            border-bottom: 40px solid transparent;
-            }
             
         label.category {
             border-bottom: 40px solid transparent;

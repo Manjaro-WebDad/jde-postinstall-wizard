@@ -12,7 +12,6 @@ from gi.repository import GLib, Pamac as p
 class Pamac:
     def __init__(self):
         self.packages = []
-        self.data = load_yaml()
         config = p.Config(conf_path="/etc/pamac.conf")
         config.set_enable_aur(False)
         self.db = p.Database(config=config)
