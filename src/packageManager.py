@@ -6,7 +6,6 @@ from importlib import reload
 gi.require_version("Gtk", "3.0")
 gi.require_version('Pamac', '10.0')
 from sources import load_yaml
-from utils import set_branch_mirrors
 from gi.repository import GLib, Pamac as p
 
 class Pamac:
@@ -123,10 +122,8 @@ class Pamac:
         utils.set_progress(0)
         return True
 
-    def install(self, branch):
+    def install(self):
       if self.packages:
          self.timeout = GLib.timeout_add(50, self.on_timeout, None)
          print(f"selected packages:{self.packages}")
-         print(f"selected branch: {branch}")
-         set_branch_mirrors(branch)
          self.run_transaction()       

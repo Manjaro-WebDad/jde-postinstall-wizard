@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # Copyright (C) 2021 Vitor Lopes
 
+from packageManager import Pamac
+from utils import progressbar, get_branch, set_branch_mirrors
 import os   
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf, GLib
 from sources import get_remote_source, load_yaml
-from packageManager import Pamac  
-from utils import progressbar, get_branch
+
 pamac = Pamac()
 
 class Wizard:
@@ -34,6 +35,7 @@ class Wizard:
             GLib.source_remove(self.internet_timeout)
             self.pages()
             self.internet_label.set_label("Internet Connected.")
+
         except Exception:
             self.internet_label.set_label("No internet, make sure you are connected.")
             return True
@@ -44,7 +46,7 @@ class Wizard:
 
     def on_apply(self, wizard, label):
         label.set_text("Installing, grab a cup of coffee")
-        pamac.install(self.branch)            
+        pamac.install()            
 
     def on_prepare(self, wizard, page):
         self.wizard.commit()
@@ -53,6 +55,8 @@ class Wizard:
         if current_page == 0:
             pass            
         elif current_page == 1:
+            print(f"selected branch: {self.branch}")
+            set_branch_mirrors(self.branch)
             pamac.check_packages(load_yaml().get("base"))
             pamac.check_packages(load_yaml().get("applications"))
         elif current_page == self.last_page:
