@@ -86,15 +86,13 @@ applications:
 snaps:
   - scrcpy # android screen mirror
 
-pre-selected:
-  - firefox-developer-edition
-
 software:
   - group:
     - category: "Browser"
     - packages:
-      - firefox-developer-edition
       - vivaldi
+    - pre-selected:
+      - firefox-developer-edition
 
   - group:
     - category: "Office"
@@ -130,14 +128,6 @@ software:
       - lutris
       - playonlinux
       - steam-manjaro
-      - dolphin-emu
-      - fceux
-      - fs-uae-launcher
-      - pcsx2
-      - ppsspp
-      - snes9x-gtk
-      - desmume
-      - dgen-sdl
   
   - group:
     - category: "3Dprint"
