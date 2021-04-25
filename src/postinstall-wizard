@@ -136,8 +136,6 @@ class Wizard:
     def pages(self):     
         for p in load_yaml().get("software"):
             self.last_page += 1
-            title = p["group"][0]["category"]
-            pkg_list = p["group"][1]["packages"]
             box = Gtk.VBox(spacing=8)
             box.props.valign = Gtk.Align.CENTER
             box.props.halign = Gtk.Align.CENTER
@@ -145,31 +143,37 @@ class Wizard:
             grid = Gtk.Grid()
             grid.get_style_context().add_class("apps")
             box.add(grid)
+            group = p["group"]
+            title = group[0]["category"]
+                        
             label = Gtk.Label(label=title)
             grid.attach(label, 0, 0, 1, 1)
             label.get_style_context().add_class("category")
-            next_row = 1           
-
-            for pkg in pkg_list:                
-                next_row += 1
-                checkbutton = Gtk.CheckButton(label=pamac.get_app_name(pkg))
-                checkbutton.connect("toggled", self.app_on_select, pkg)
-                grid.attach(checkbutton, 0, next_row, 1, 1)
-                pre_selected = load_yaml().get("pre-selected")
-
-                if pkg in pre_selected:
-                    checkbutton.set_active(True)
-                image = pamac.get_app_icon(pkg)
-                if image:                        
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                        filename=image,
-                        width=32,
-                        height=32,
-                        preserve_aspect_ratio=True
-                        )
-                    icon = Gtk.Image.new_from_pixbuf(pixbuf)
-                    grid.attach_next_to(icon, checkbutton, Gtk.PositionType.RIGHT, 2, 1)                         
-               
+            next_row = 1 
+            pkg_sources = [group[1]["packages"]]
+            if len(group) == 3 and "pre-selected" in group[2]:
+                pkg_sources.insert(0, (group[2]["pre-selected"]))
+            
+            for index, group_pkg_list in enumerate(pkg_sources):
+                for pkg in group_pkg_list:                
+                    next_row += 1
+                    checkbutton = Gtk.CheckButton(label=pamac.get_app_name(pkg))
+                    checkbutton.connect("toggled", self.app_on_select, pkg)
+                    grid.attach(checkbutton, 0, next_row, 1, 1)
+                    if len(pkg_sources) == 2 and index == 0:
+                        checkbutton.set_active(True)
+                        
+                    image = pamac.get_app_icon(pkg)
+                    if image:                        
+                        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                            filename=image,
+                            width=32,
+                            height=32,
+                            preserve_aspect_ratio=True
+                            )
+                        icon = Gtk.Image.new_from_pixbuf(pixbuf)
+                        grid.attach_next_to(icon, checkbutton, Gtk.PositionType.RIGHT, 2, 1)                         
+                
 
             box.show_all()
             self.wizard.append_page(box)
